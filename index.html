@@ -1050,7 +1050,45 @@
       }
     }
 
-  </style>
+  
+    .event-reminder-btn{
+      margin-top:8px;
+      border:0;
+      border-radius:12px;
+      padding:8px 10px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:.78rem;
+      background:rgba(255,255,255,.72);
+      color:inherit;
+      box-shadow:0 6px 16px rgba(0,0,0,.06);
+      transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+      backdrop-filter:blur(8px);
+    }
+    .event-reminder-btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.09)}
+    .event-reminder-btn:active{transform:scale(.97)}
+    .reminder-modal{
+      position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;
+      padding:18px;background:rgba(16,24,20,.36);backdrop-filter:blur(8px);
+    }
+    .reminder-modal.active{display:flex}
+    .reminder-card{
+      width:min(460px,100%);background:#fff;border-radius:24px;padding:20px;
+      box-shadow:0 24px 70px rgba(0,0,0,.18);animation:reminderPop .22s ease;
+    }
+    @keyframes reminderPop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+    .reminder-card h3{margin:0 0 8px}
+    .reminder-card p{margin:0 0 16px;line-height:1.8;opacity:.78}
+    .reminder-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .reminder-actions button,.reminder-actions a{
+      border:0;border-radius:14px;padding:12px 14px;text-align:center;text-decoration:none;
+      font-weight:800;cursor:pointer;font:inherit
+    }
+    .reminder-primary{background:#2f6e4f;color:#fff}
+    .reminder-soft{background:#edf3ef;color:#204a36}
+    @media(max-width:520px){.reminder-actions{grid-template-columns:1fr}.reminder-card{border-radius:20px}}
+
+</style>
 
 </head>
 <body>
@@ -1855,6 +1893,154 @@
 
     populateLegendAndFilter();
     render();
-  </script>
+  
+    let activeReminderEvent = null;
+
+    function toDateObj(isoDate){
+      const [y,m,d] = isoDate.split('-').map(Number);
+      return new Date(y, m-1, d);
+    }
+
+    function ymdLocal(date){
+      const y = date.getFullYear();
+      const m = String(date.getMonth()+1).padStart(2,'0');
+      const d = String(date.getDate()).padStart(2,'0');
+      return `${y}${m}${d}`;
+    }
+
+    function getGoogleCalendarUrl(title, isoDate){
+      const start = toDateObj(isoDate);
+      const end = new Date(start);
+      end.setDate(end.getDate()+1);
+      const dates = `${ymdLocal(start)}/${ymdLocal(end)}`;
+      const details = 'حدث من رزنامة الجنان 2026-2027';
+      return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${dates}&details=${encodeURIComponent(details)}`;
+    }
+
+    function makeICS(title, isoDate){
+      const start = toDateObj(isoDate);
+      const end = new Date(start);
+      end.setDate(end.getDate()+1);
+      const dtstamp = new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
+      const uid = `${isoDate}-${Math.random().toString(36).slice(2)}@jinan-calendar`;
+      return [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Jinan Calendar//AR//EN',
+        'CALSCALE:GREGORIAN',
+        'BEGIN:VEVENT',
+        `UID:${uid}`,
+        `DTSTAMP:${dtstamp}`,
+        `DTSTART;VALUE=DATE:${ymdLocal(start)}`,
+        `DTEND;VALUE=DATE:${ymdLocal(end)}`,
+        `SUMMARY:${String(title).replace(/,/g,'\\,')}`,
+        'DESCRIPTION:حدث من رزنامة الجنان 2026-2027',
+        'BEGIN:VALARM',
+        'TRIGGER:-P1D',
+        'ACTION:DISPLAY',
+        'DESCRIPTION:تذكير قبل يوم',
+        'END:VALARM',
+        'END:VEVENT',
+        'END:VCALENDAR'
+      ].join('\r\n');
+    }
+
+    function openReminder(title, isoDate){
+      activeReminderEvent = {title, isoDate};
+      const modal = document.getElementById('reminderModal');
+      document.getElementById('reminderText').textContent = `${title} — ${isoDate}`;
+      document.getElementById('googleCalendarLink').href = getGoogleCalendarUrl(title, isoDate);
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden','false');
+    }
+
+    function closeReminder(){
+      const modal = document.getElementById('reminderModal');
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden','true');
+      activeReminderEvent = null;
+    }
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-reminder-title][data-reminder-date]');
+      if(btn){
+        e.preventDefault();
+        openReminder(btn.dataset.reminderTitle, btn.dataset.reminderDate);
+      }
+    });
+
+    document.getElementById('downloadIcsBtn')?.addEventListener('click', () => {
+      if(!activeReminderEvent) return;
+      const ics = makeICS(activeReminderEvent.title, activeReminderEvent.isoDate);
+      const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Jinan-${activeReminderEvent.isoDate}.ics`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
+      closeReminder();
+      showToast('تم تجهيز التذكير 🔔');
+    });
+
+    document.getElementById('closeReminderBtn')?.addEventListener('click', closeReminder);
+    document.getElementById('reminderModal')?.addEventListener('click', (e) => {
+      if(e.target.id === 'reminderModal') closeReminder();
+    });
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape') closeReminder();
+    });
+
+    function attachReminderButtons(){
+      document.querySelectorAll('.event-card').forEach(card => {
+        if(card.querySelector('.event-reminder-btn')) return;
+
+        const dayCell = card.closest('[data-date], .day-cell');
+        let isoDate = dayCell?.dataset?.date || '';
+
+        // Fallback: infer from nearest visible day + current month key
+        if(!isoDate){
+          const num = dayCell?.querySelector('.day-number')?.textContent?.trim();
+          const currentMonth = months?.[currentMonthIndex]?.key || months?.[currentMonthIndex]?.id || '';
+          if(num && /^\d{4}-\d{2}$/.test(currentMonth)){
+            isoDate = `${currentMonth}-${String(num).padStart(2,'0')}`;
+          }
+        }
+
+        const titleNode = card.querySelector('.event-title, .event-text, strong, b');
+        const title = (titleNode?.textContent || card.textContent || 'حدث مدرسي').trim().replace(/\s+/g,' ');
+
+        if(!isoDate) return;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'event-reminder-btn';
+        btn.textContent = '🔔 ذكّرني';
+        btn.dataset.reminderTitle = title;
+        btn.dataset.reminderDate = isoDate;
+        card.appendChild(btn);
+      });
+    }
+
+    const reminderObserver = new MutationObserver(() => attachReminderButtons());
+    reminderObserver.observe(document.body, {childList:true, subtree:true});
+    setTimeout(attachReminderButtons, 250);
+
+</script>
+
+  <div id="reminderModal" class="reminder-modal" aria-hidden="true">
+    <div class="reminder-card" role="dialog" aria-modal="true" aria-labelledby="reminderTitle">
+      <h3 id="reminderTitle">🔔 إضافة تذكير</h3>
+      <p id="reminderText">اختر طريقة إضافة الحدث إلى تقويمك.</p>
+      <div class="reminder-actions">
+        <a id="googleCalendarLink" class="reminder-primary" href="#" target="_blank" rel="noopener">Google Calendar</a>
+        <button id="downloadIcsBtn" class="reminder-soft" type="button">تقويم الهاتف / Apple</button>
+        <button id="closeReminderBtn" class="reminder-soft" type="button" style="grid-column:1/-1">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
