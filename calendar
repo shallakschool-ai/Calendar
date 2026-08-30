@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>رزنامة الجنان</title>
+  
+  <style>
+    :root{
+      --bg:#f4f7f6;
+      --surface:rgba(255,255,255,.72);
+      --surface-strong:rgba(255,255,255,.94);
+      --text:#18231f;
+      --muted:#738078;
+      --line:rgba(29,50,42,.09);
+
+      --green:#4f7568;
+      --green-2:#6c9587;
+      --green-dark:#35584d;
+      --green-soft:#eef5f2;
+
+      --school:#c98655;
+      --meeting:#718fa9;
+      --holiday:#b8986e;
+      --global:#93a869;
+      --islamic:#6f9d89;
+      --grades:#8c82b7;
+      --review:#70a6b8;
+      --exam:#cc6f78;
+
+      --shadow-lg:0 24px 70px rgba(31,55,46,.10);
+      --shadow-md:0 14px 34px rgba(31,55,46,.08);
+      --shadow-sm:0 7px 18px rgba(31,55,46,.055);
+
+      --r-xl:30px;
+      --r-lg:24px;
+      --r-md:18px;
+      --r-sm:14px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Tahoma,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+      background:
+        radial-gradient(circle at 15% 8%, rgba(92,137,121,.16), transparent 28%),
+        radial-gradient(circle at 88% 18%, rgba(116,148,136,.10), transparent 22%),
+        linear-gradient(180deg,#fbfcfc 0%,#f2f6f4 48%,#edf2f0 100%);
+      background-attachment:fixed;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(255,255,255,.18),rgba(255,255,255,0)),
+        radial-gradient(circle at 50% 100%,rgba(255,255,255,.72),transparent 46%);
+      z-index:-1;
+    }
+
+    .container{
+      width:min(1180px,calc(100% - 20px));
+      margin:12px auto 28px;
+      padding-bottom:110px;
+    }
+
+    .glass{
+      background:var(--surface);
+      border:1px solid rgba(255,255,255,.72);
+      box-shadow:var(--shadow-md);
+      backdrop-filter:blur(24px) saturate(140%);
+      -webkit-backdrop-filter:blur(24px) saturate(140%);
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border-radius:34px;
+      padding:24px;
+      background:
+        linear-gradient(135deg,rgba(255,255,255,.92),rgba(255,255,255,.70)),
+        linear-gradient(135deg,rgba(83,122,108,.13),rgba(255,255,255,0));
+      animation:fadeUp .55s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .hero::before,
+    .hero::after{
+      content:"";
+      position:absolute;
+      border-radius:999px;
+      filter:blur(2px);
+      pointer-events:none;
+    }
+
+    .hero::before{
+      width:220px;height:220px;
+      left:-80px;top:-110px;
+      background:radial-gradient(circle,rgba(83,122,108,.16),rgba(83,122,108,0) 70%);
+    }
+
+    .hero::after{
+      width:250px;height:250px;
+      right:-120px;bottom:-150px;
+      background:radial-gradient(circle,rgba(115,155,141,.12),rgba(115,155,141,0) 72%);
+    }
+
+    @keyframes fadeUp{
+      from{opacity:0;transform:translateY(14px) scale(.99)}
+      to{opacity:1;transform:translateY(0) scale(1)}
+    }
+
+    @keyframes monthIn{
+      from{opacity:.45;transform:translateY(10px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    @keyframes tapPop{
+      0%{transform:scale(1)}
+      50%{transform:scale(.975)}
+      100%{transform:scale(1)}
+    }
+
+    .month-animate{animation:monthIn .30s cubic-bezier(.2,.8,.2,1)}
+    .tap-pop{animation:tapPop .2s ease}
+
+    .top-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      position:relative;
+      z-index:1;
+    }
+
+    .pills{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      min-height:32px;
+      padding:7px 12px;
+      border-radius:999px;
+      color:var(--green-dark);
+      background:rgba(83,122,108,.09);
+      border:1px solid rgba(83,122,108,.10);
+      font-size:.78rem;
+      font-weight:750;
+      letter-spacing:.01em;
+    }
+
+    h1{
+      margin:0;
+      color:var(--green-dark);
+      font-size:clamp(1.55rem,2.6vw,2.2rem);
+      line-height:1.1;
+      letter-spacing:-.045em;
+      font-weight:850;
+    }
+
+    .hero p{
+      margin:7px 0 0;
+      color:var(--muted);
+      font-size:.94rem;
+      line-height:1.7;
+      font-weight:600;
+    }
+
+    .hero img{
+      width:58px !important;
+      height:58px !important;
+      padding:7px !important;
+      border-radius:20px !important;
+      background:rgba(255,255,255,.9) !important;
+      box-shadow:0 12px 30px rgba(35,59,51,.12) !important;
+      border:1px solid rgba(255,255,255,.9);
+      position:relative;
+      z-index:2;
+    }
+
+    .legend-box{
+      position:relative;
+      z-index:1;
+      margin-top:18px;
+      padding:16px;
+      border-radius:24px;
+      background:rgba(255,255,255,.66);
+      border:1px solid rgba(29,50,42,.07);
+    }
+
+    .legend-box h2{
+      margin:0 0 12px;
+      color:var(--green-dark);
+      font-size:.95rem;
+      font-weight:800;
+    }
+
+    .legend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:9px;
+    }
+
+    .legend-item{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-height:34px;
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.74);
+      border:1px solid rgba(29,50,42,.06);
+      font-size:.76rem;
+      color:#3c4a44;
+      font-weight:650;
+    }
+
+    .dot,.marker{border-radius:50%}
+    .dot{width:9px;height:9px;flex:0 0 9px}
+
+    .toolbar{
+      position:sticky;
+      top:10px;
+      z-index:35;
+      margin:12px 0;
+      padding:10px;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:9px;
+      border-radius:24px;
+      background:rgba(248,251,250,.78);
+      box-shadow:0 14px 34px rgba(31,55,46,.08);
+    }
+
+    input,select,textarea,button{font:inherit}
+
+    .field,.select,.textarea{
+      width:100%;
+      color:var(--text);
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(29,50,42,.08);
+      outline:none;
+      border-radius:17px;
+      transition:.2s ease;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+    }
+
+    .field,.select{padding:12px 14px}
+    .textarea{min-height:128px;padding:14px;resize:vertical;line-height:1.8}
+
+    .field:focus,.select:focus,.textarea:focus{
+      border-color:rgba(83,122,108,.28);
+      box-shadow:0 0 0 4px rgba(83,122,108,.075);
+      background:#fff;
+    }
+
+    .switch-wrap,.action-wrap{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .switch-wrap{
+      padding:4px;
+      border-radius:17px;
+      background:rgba(255,255,255,.74);
+      border:1px solid rgba(29,50,42,.07);
+    }
+
+    button{
+      border:0;
+      cursor:pointer;
+      border-radius:15px;
+      padding:10px 14px;
+      font-weight:760;
+      transition:transform .18s ease,box-shadow .18s ease,background .18s ease,color .18s ease;
+    }
+
+    button:active{transform:scale(.98)}
+
+    .switch-btn,.nav-btn{
+      flex:1;
+      background:transparent;
+      color:var(--muted);
+    }
+
+    .switch-btn.active,.btn-primary,.nav-btn.active{
+      color:#fff;
+      background:linear-gradient(135deg,var(--green-2),var(--green-dark));
+      box-shadow:0 10px 22px rgba(65,101,88,.20);
+    }
+
+    .btn-soft{
+      flex:1;
+      color:#31413a;
+      background:rgba(255,255,255,.86);
+      border:1px solid rgba(29,50,42,.07);
+      box-shadow:var(--shadow-sm);
+    }
+
+    .month-nav{
+      display:flex;
+      gap:8px;
+      overflow:auto;
+      padding:2px 2px 8px;
+      margin-bottom:12px;
+      scroll-snap-type:x proximity;
+      scrollbar-width:none;
+    }
+    .month-nav::-webkit-scrollbar{display:none}
+
+    .month-chip{
+      min-width:116px;
+      flex:0 0 auto;
+      scroll-snap-align:start;
+      padding:10px 13px;
+      border-radius:16px;
+      color:#425149;
+      background:rgba(255,255,255,.80);
+      border:1px solid rgba(29,50,42,.07);
+      box-shadow:var(--shadow-sm);
+      font-size:.82rem;
+    }
+
+    .month-chip.active{
+      color:#fff;
+      border-color:transparent;
+      background:linear-gradient(135deg,var(--green-2),var(--green-dark));
+      box-shadow:0 12px 28px rgba(65,101,88,.18);
+    }
+
+    .panel{
+      padding:15px;
+      margin-bottom:12px;
+      border-radius:26px;
+      background:rgba(255,255,255,.72);
+    }
+
+    .layout{display:grid;grid-template-columns:1fr;gap:12px}
+
+    .calendar-panel{
+      touch-action:pan-y;
+      min-width:0;
+    }
+
+    .swipe-hint{
+      margin:0 0 11px;
+      padding:7px 10px;
+      text-align:center;
+      color:#7a8881;
+      background:rgba(239,245,242,.74);
+      border:1px solid rgba(29,50,42,.06);
+      border-radius:12px;
+      font-size:.72rem;
+    }
+
+    .month-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .season{
+      display:inline-flex;
+      padding:6px 10px;
+      margin-bottom:6px;
+      border-radius:999px;
+      color:var(--green-dark);
+      background:rgba(83,122,108,.08);
+      font-size:.73rem;
+      font-weight:730;
+    }
+
+    .month-title{
+      margin:0;
+      color:var(--green-dark);
+      font-size:1.18rem;
+      letter-spacing:-.025em;
+      font-weight:850;
+    }
+
+    .calendar-grid{
+      display:grid;
+      grid-template-columns:repeat(7,minmax(0,1fr));
+      gap:6px;
+    }
+
+    .weekday,.day{
+      border:1px solid rgba(29,50,42,.07);
+      border-radius:15px;
+      background:rgba(255,255,255,.86);
+    }
+
+    .weekday{
+      padding:8px 2px;
+      text-align:center;
+      color:#708078;
+      background:rgba(241,246,244,.86);
+      font-size:.62rem;
+      font-weight:780;
+    }
+
+    .day{
+      min-height:74px;
+      padding:6px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      box-shadow:0 5px 14px rgba(31,55,46,.035);
+      transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+    }
+
+    .day.empty{
+      background:rgba(248,250,249,.48);
+      border-style:dashed;
+      box-shadow:none;
+    }
+
+    .day.has-events{cursor:pointer}
+    .day.has-events:hover{
+      transform:translateY(-2px);
+      box-shadow:0 10px 20px rgba(31,55,46,.08);
+      border-color:rgba(83,122,108,.14);
+    }
+
+    .day.dimmed{opacity:.38}
+
+    .day-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:4px;
+    }
+
+    .day-number{
+      width:26px;
+      height:26px;
+      display:inline-flex;
+      justify-content:center;
+      align-items:center;
+      border-radius:10px;
+      background:#f1f4f3;
+      font-size:.72rem;
+      font-weight:850;
+    }
+
+    .day-text{
+      color:#68766f;
+      font-size:.66rem;
+      line-height:1.35;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+
+    .count{
+      display:none;
+      color:var(--muted);
+      font-size:.67rem;
+      font-weight:720;
+    }
+
+    .marker-row{
+      margin-top:auto;
+      display:flex;
+      flex-wrap:wrap;
+      gap:4px;
+    }
+
+    .marker{width:6px;height:6px}
+
+    .panel-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .panel-head h3,.panel-head h4{
+      margin:0;
+      color:var(--green-dark);
+      font-size:.98rem;
+      font-weight:850;
+    }
+
+    .muted{
+      margin:0;
+      color:var(--muted);
+      font-size:.79rem;
+      font-weight:650;
+    }
+
+    .events{display:grid;gap:9px}
+
+    .event-card{
+      position:relative;
+      display:grid;
+      gap:8px;
+      padding:13px 13px 13px 16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.90);
+      border:1px solid rgba(29,50,42,.07);
+      box-shadow:0 8px 18px rgba(31,55,46,.045);
+      transition:transform .2s ease,box-shadow .2s ease;
+      overflow:hidden;
+    }
+
+    .event-card::before{
+      content:"";
+      position:absolute;
+      right:0;
+      top:0;
+      bottom:0;
+      width:3px;
+      background:linear-gradient(180deg,var(--green-2),var(--green-dark));
+      opacity:.65;
+    }
+
+    .event-card:hover{
+      transform:translateY(-2px);
+      box-shadow:0 14px 26px rgba(31,55,46,.075);
+    }
+
+    .event-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      font-size:.78rem;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:6px 9px;
+      border-radius:999px;
+      background:rgba(245,248,247,.92);
+      border:1px solid rgba(29,50,42,.06);
+      color:#65736c;
+      font-size:.68rem;
+      font-weight:750;
+    }
+
+    .event-title{
+      margin:0;
+      color:#233029;
+      line-height:1.55;
+      font-size:.92rem;
+      font-weight:820;
+      letter-spacing:-.01em;
+    }
+
+    .summary{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+    }
+
+    .summary-box{
+      padding:12px;
+      text-align:center;
+      border-radius:17px;
+      background:rgba(255,255,255,.86);
+      border:1px solid rgba(29,50,42,.07);
+      box-shadow:0 6px 16px rgba(31,55,46,.035);
+    }
+
+    .summary-box strong{
+      display:block;
+      margin-bottom:3px;
+      color:var(--green-dark);
+      font-size:1.08rem;
+      font-weight:850;
+    }
+
+    .summary-box span{
+      color:#6f7d76;
+      font-size:.74rem;
+      font-weight:650;
+    }
+
+    .year-view{
+      display:none;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+
+    .year-view.active{display:grid}
+    .month-view.active{display:block}
+
+    .mini-month{
+      padding:13px;
+      border-radius:22px;
+    }
+
+    .mini-month h3{
+      margin:0 0 10px;
+      color:var(--green-dark);
+      font-size:.96rem;
+      font-weight:850;
+    }
+
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:5px;
+    }
+
+    .mini-head,.mini-day{
+      padding:7px 0;
+      text-align:center;
+      border-radius:10px;
+      font-size:.69rem;
+    }
+
+    .mini-head{
+      color:#74837b;
+      background:#f3f6f5;
+      font-weight:720;
+    }
+
+    .mini-day{background:rgba(255,255,255,.88)}
+    .mini-day.empty{background:rgba(248,250,249,.58)}
+
+    .mini-day.eventful{
+      color:var(--green-dark);
+      background:var(--green-soft);
+      font-weight:850;
+      cursor:pointer;
+    }
+
+    .footer{
+      margin-top:14px;
+      padding:6px 8px 0;
+      text-align:center;
+      color:#89958f;
+      font-size:.78rem;
+      line-height:1.8;
+    }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      z-index:1000;
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      padding:10px;
+      background:rgba(20,31,27,.28);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+    }
+
+    .modal.show{display:flex}
+
+    .modal-card{
+      width:min(520px,100%);
+      max-height:82vh;
+      overflow:auto;
+      padding:16px;
+      border-radius:28px 28px 18px 18px;
+      background:rgba(255,255,255,.96);
+      animation:fadeUp .22s ease;
+    }
+
+    .modal-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:12px;
+    }
+
+    .modal-head h3{
+      margin:0;
+      color:var(--green-dark);
+      font-size:1rem;
+      font-weight:850;
+    }
+
+    .close-btn{
+      width:38px;
+      height:38px;
+      padding:0;
+      border-radius:50%;
+      color:#43534b;
+      background:#f1f5f3;
+      font-size:1.1rem;
+      line-height:1;
+    }
+
+    .empty-state{
+      padding:16px;
+      text-align:center;
+      color:var(--muted);
+      background:rgba(255,255,255,.82);
+      border:1px dashed rgba(29,50,42,.12);
+      border-radius:16px;
+      font-size:.86rem;
+    }
+
+    #bottomNav{
+      position:fixed;
+      left:50%;
+      bottom:12px;
+      transform:translateX(-50%);
+      width:min(520px,calc(100% - 20px));
+      z-index:50;
+    }
+
+    .bottom-nav-wrap{
+      display:flex;
+      gap:7px;
+      padding:7px;
+      border-radius:24px;
+      background:rgba(250,252,251,.80);
+      border:1px solid rgba(255,255,255,.8);
+      box-shadow:0 14px 36px rgba(31,55,46,.14);
+      backdrop-filter:blur(24px) saturate(150%);
+      -webkit-backdrop-filter:blur(24px) saturate(150%);
+    }
+
+    .nav-btn{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:3px;
+      padding:9px 8px;
+      border-radius:17px;
+    }
+
+    .nav-btn small{
+      font-size:.68rem;
+      font-weight:700;
+    }
+
+    @media (min-width:700px){
+      .container{width:min(1160px,calc(100% - 28px));margin-top:18px}
+      .hero{padding:28px}
+      .legend{gap:10px}
+      .toolbar{grid-template-columns:minmax(260px,1fr) 210px auto auto}
+      .month-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));overflow:visible}
+      .month-chip{min-width:0}
+      .layout{grid-template-columns:minmax(0,1.25fr) minmax(300px,.62fr);gap:14px}
+      .calendar-grid{gap:8px}
+      .weekday{font-size:.78rem;padding:9px 4px}
+      .day{min-height:96px;padding:8px;border-radius:18px}
+      .day-number{width:30px;height:30px;font-size:.82rem;border-radius:11px}
+      .day-text{font-size:.74rem;-webkit-line-clamp:3}
+      .count{display:block}
+      .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .year-view{grid-template-columns:repeat(2,minmax(0,1fr))}
+      #bottomNav{width:min(620px,calc(100% - 28px))}
+    }
+
+    @media (min-width:1050px){
+      .hero{
+        display:grid;
+        grid-template-columns:1.2fr .8fr;
+        align-items:start;
+        gap:18px;
+      }
+      .legend-box{margin-top:0}
+      .month-nav{grid-template-columns:repeat(10,minmax(0,1fr))}
+      .month-chip{font-size:.78rem;padding:10px 8px}
+      .year-view{grid-template-columns:repeat(3,minmax(0,1fr))}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      *{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+    }
+
+    @media print{
+      body{background:#fff}
+      .toolbar,#bottomNav,.swipe-hint{display:none!important}
+      .container{width:100%;margin:0;padding:0}
+      .glass{box-shadow:none;backdrop-filter:none;background:#fff;border:1px solid #ddd}
+      .month-nav{display:none}
+    }
+  </style>
+
+</head>
+<body>
+  <div class="container">
+
+    <header class="hero glass">
+      <div class="top-row">
+        <div>
+          <div class="pills">
+            <span class="pill">2026 / 2027</span>
+            
+          </div>
+          <h1>رزنامة الجنان</h1>
+          <p>العام الدراسي 2026–2027</p>
+         
+        </div>
+         <img src="logo.png.png" alt="Logo"  style="
+       width:52px;
+       height:52px;
+       border-radius:50%;
+       background:white;
+       padding:6px;
+       object-fit:contain;
+       box-shadow:0 6px 16px rgba(0,0,0,0.1);">
+      </div>
+
+      <div class="legend-box">
+        <h2>دليل الألوان</h2>
+        <div class="legend" id="legend"></div>
+      </div>
+    </header>
+
+    <section class="toolbar glass">
+      <input id="searchInput" class="field" type="text" placeholder="ابحث عن حدث أو مناسبة..." />
+      <select id="categoryFilter" class="select">
+        <option value="all">كل التصنيفات</option>
+      </select>
+      <div class="switch-wrap">
+        <button class="switch-btn active" data-view="month">📅 شهري</button>
+        <button class="switch-btn" data-view="year">🗓️ سنوي</button>
+      </div>
+      <div class="action-wrap">
+        <button id="resetBtn" class="btn-soft">🏠 بداية</button>
+        <button id="printBtn" class="btn-primary">🖨️ طباعة</button>
+      </div>
+    </section>
+
+    <nav class="month-nav" id="monthNav"></nav>
+
+    <section class="month-view active" id="monthView">
+      <div class="layout">
+        <div class="panel glass calendar-panel" id="calendarPanel">
+          <p class="swipe-hint">اسحب يمينًا أو يسارًا للتنقل بين الأشهر</p>
+          <div class="month-header">
+            <div>
+              <div class="season" id="seasonLabel"></div>
+              <h2 class="month-title" id="monthTitle"></h2>
+            </div>
+            <div class="action-wrap">
+              <button id="prevMonth" class="btn-soft">◀</button>
+              <button id="nextMonth" class="btn-soft">▶</button>
+            </div>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+
+        <div>
+          <div class="panel glass" id="eventsPanel">
+            <div class="panel-head">
+              <h3>الأحداث</h3>
+              <p class="muted" id="eventsCount">0 حدث</p>
+            </div>
+            <div class="events" id="eventList"></div>
+          </div>
+
+          <div class="panel glass">
+            <div class="panel-head">
+              <h4>ملخص سريع</h4>
+            </div>
+            <div class="summary" id="summaryGrid"></div>
+          </div>
+
+          <div class="panel glass">
+            <div class="panel-head">
+              <h4>ملاحظات</h4>
+            </div>
+            <textarea id="notesArea" class="textarea" placeholder="اكتب ملاحظاتك هنا..."></textarea>
+            <div class="action-wrap" style="margin-top:12px;">
+              <button id="saveNotes" class="btn-primary">حفظ</button>
+              <button id="clearNotes" class="btn-soft">مسح</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="year-view" id="yearView"></section>
+
+    <div class="footer">رزنامة الجنان • 2026–2027</div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-card glass">
+      <div class="modal-head">
+        <h3 id="modalTitle">تفاصيل اليوم</h3>
+        <button id="closeModal" class="close-btn">×</button>
+      </div>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <nav id="bottomNav">
+    <div class="bottom-nav-wrap glass">
+      <button class="nav-btn active" data-target="month">
+        <span>📅</span>
+        <small>التقويم</small>
+      </button>
+      <button class="nav-btn" data-target="events">
+        <span>🗂️</span>
+        <small>الأحداث</small>
+      </button>
+      <button class="nav-btn" data-target="search">
+        <span>🔍</span>
+        <small>بحث</small>
+      </button>
+    </div>
+  </nav>
+
+  <script>
+    const categoryMeta = {
+      school:  { label: 'مواعيد تربوية', color: 'var(--school)' },
+      meeting: { label: 'لقاءات وOpen Day', color: 'var(--meeting)' },
+      holiday: { label: 'أعطال ومناسبات', color: 'var(--holiday)' },
+      global:  { label: 'مناسبات عالمية', color: 'var(--global)' },
+      islamic: { label: 'مناسبات إسلامية', color: 'var(--islamic)' },
+      grades:  { label: 'توزيع علامات', color: 'var(--grades)' },
+      review:  { label: 'مراجعة', color: 'var(--review)' },
+      exam:    { label: 'امتحانات', color: 'var(--exam)' }
+    };
+
+    const weekDays = ['الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد'];
+
+    const months = [
+      { key:'2026-09', title:'أيلول 2026', season:'بداية العام الدراسي', days:30, startOffset:1, events:[
+        { day:7, title:'دخول الشهادات: الثالث الثانوي - ثانوية ومنية', category:'school' },
+        { day:9, title:'دخول صف التاسع - منية وثانوية', category:'school' },
+        { day:14, title:'دخول المرحلة الثانوية - ثانوية', category:'school' },
+        { day:15, title:'دخول المتوسط والثانوي - منية', category:'school' },
+        { day:16, title:'دخول المرحلة المتوسطة - ثانوية', category:'school' },
+        { day:21, title:'دخول الحلقة الثانية - ثانوية', category:'school' },
+        { day:22, title:'دخول الحلقة الثانية - منية', category:'school' },
+        { day:23, title:'دخول الحلقة الأولى - ثانوية', category:'school' },
+        { day:24, title:'دخول الحلقة الأولى - منية', category:'school' },
+        { day:26, title:'اجتماع أول السنة إ م ث', category:'meeting' },
+        { day:28, title:'دخول روضة 2 و3 - ثانوية', category:'school' },
+        { day:29, title:'دخول روضة 2 و3 - منية', category:'school' },
+        { day:30, title:'دخول روضة 1 - ثانوية', category:'school' }
+      ]},
+      { key:'2026-10', title:'تشرين الأول 2026', season:'الخريف', days:31, startOffset:3, events:[
+        { day:1, title:'دخول روضة 1 - منية', category:'school' },
+        { day:3, title:'اجتماع أول السنة إ م ث - منية', category:'meeting' }
+      ]},
+      { key:'2026-11', title:'تشرين الثاني 2026', season:'الخريف', days:30, startOffset:6, events:[
+        { day:16, title:'يوم التسامح', category:'global' },
+        { day:22, title:'عيد الاستقلال', category:'holiday' },
+        { day:24, title:'انتهاء السعي الأول - متوسط وثانوي', category:'school' }
+      ]},
+      { key:'2026-12', title:'كانون الأول 2026', season:'الخريف', days:31, startOffset:1, events:[
+        { day:3, title:'توزيع علامات السعي الأول - متوسط وثانوي', category:'grades' },
+        { day:3, title:'Open Day - الروضات', category:'meeting' },
+        { day:8, title:'Open Day PS1 M 16', category:'meeting' },
+        { day:10, title:'يوم حقوق الإنسان', category:'global' },
+        { day:12, title:'انتهاء السعي الأول - الحلقة الثانية', category:'school' },
+        { day:18, title:'يوم اللغة العربية', category:'global' },
+        { day:21, title:'توزيع علامات الحلقة الثانية وتقييمات الحلقة الأولى - السعي الأول', category:'grades' },
+        { day:24, title:'عطلة الشتاء', category:'holiday' }
+      ]},
+      { key:'2027-01', title:'كانون الثاني 2027', season:'الشتاء', days:31, startOffset:4, events:[
+        { day:4, title:'توزيع علامات الحلقة الثانية وتقييمات الحلقة الأولى - سعي 1 (21 s)', category:'grades' },
+        { day:24, title:'اليوم العالمي للتعليم', category:'global' },
+        { day:26, title:'اليوم العالمي للطاقة النظيفة', category:'global' },
+        { day:27, title:'انتهاء السعي الثاني - متوسط وثانوي', category:'school' }
+      ]},
+      { key:'2027-02', title:'شباط 2027', season:'الشتاء', days:28, startOffset:0, events:[
+        { day:1, title:'امتحان 1 - الحلقة الثانية ضمن الدوام', category:'exam' },
+        { day:3, title:'امتحان 1 - الحلقة الثانية ضمن الدوام', category:'exam' },
+        { day:4, title:'توزيع علامات السعي الثاني - متوسط وثانوي', category:'grades' },
+        { day:6, title:'امتحان الحلقة الثانية ضمن الدوام (عطلة م ث)', category:'exam' },
+        { day:8, title:'رمضان المبارك', category:'islamic' },
+        { day:9, title:'مار مارون', category:'holiday' },
+        { day:10, title:'امتحان 1 - متوسط وثانوي', category:'exam' },
+        { day:11, title:'عطلة مراجعة - متوسط وثانوي', category:'review' },
+        { day:13, title:'امتحان 2 - متوسط وثانوي', category:'exam' },
+        { day:14, title:'ذكرى اغتيال الحريري', category:'holiday' },
+        { day:15, title:'امتحان 3', category:'exam' },
+        { day:16, title:'عطلة مراجعة - متوسط وثانوي', category:'review' },
+        { day:17, title:'عطلة مراجعة - متوسط وثانوي', category:'review' },
+        { day:18, title:'امتحان 4 - متوسط وثانوي', category:'exam' }
+      ]},
+      { key:'2027-03', title:'آذار 2027', season:'بداية فصل الربيع', days:31, startOffset:0, events:[
+        { day:1, title:'توزيع علامات الروضات والحلقة الأولى والثانية - فصل 1', category:'grades' },
+        { day:2, title:'توزيع علامات الفصل الأول - متوسط وثانوي', category:'grades' },
+        { day:6, title:'عطلة العيد', category:'holiday' },
+        { day:9, title:'يوم المعلم', category:'school' },
+        { day:9, title:'عيد الفطر', category:'islamic' },
+        { day:21, title:'يوم الأم', category:'school' },
+        { day:22, title:'يوم الطفل', category:'global' },
+        { day:25, title:'عيد البشارة', category:'holiday' }
+      ]},
+      { key:'2027-04', title:'نيسان 2027', season:'الربيع', days:30, startOffset:3, events:[
+        { day:7, title:'اليوم العالمي للصحة', category:'global' },
+        { day:21, title:'انتهاء السعي الثاني - الحلقة الثانية ومتوسط وثانوي', category:'school' },
+        { day:23, title:'اليوم العالمي للكتاب واللغة الإنجليزية', category:'global' }
+      ]},
+      { key:'2027-05', title:'أيار 2027', season:'الربيع', days:31, startOffset:5, events:[
+        { day:1, title:'الفصح / عيد العمال', category:'holiday' },
+        { day:3, title:'توزيع علامات الحلقة الثانية - السعي الثاني (4)', category:'grades' },
+        { day:4, title:'توزيع علامات الحلقة الثانية - السعي الثاني', category:'grades' },
+        { day:5, title:'توزيع علامات السعي الثالث - متوسط وثانوي', category:'grades' },
+        { day:16, title:'عيد الأضحى', category:'islamic' },
+        { day:23, title:'Open Day PS3 / PS2 / PS1 + علامات (24)', category:'meeting' },
+        { day:24, title:'المقاومة والتحرير (25)', category:'holiday' },
+        { day:25, title:'Open Day PS3 / PS2 / PS1 + علامات (26)', category:'meeting' },
+        { day:31, title:'انتهاء العام الدراسي - الحلقة الأولى والروضات', category:'school' }
+      ]},
+      { key:'2027-06', title:'حزيران 2027', season:'بداية فصل الصيف', days:30, startOffset:1, events:[
+        { day:1, title:'مراجعة - الحلقة الثانية ومتوسط وثانوي', category:'review' },
+        { day:2, title:'مراجعة', category:'review' },
+        { day:3, title:'مراجعة', category:'review' },
+        { day:5, title:'عطلة مراجعة / اليوم العالمي للبيئة', category:'review' },
+        { day:6, title:'رأس السنة الهجرية', category:'islamic' },
+        { day:7, title:'عطلة مراجعة', category:'review' },
+        { day:8, title:'الحلقة الثانية ومتوسط وثانوي - امتحان الفصل الثاني والأخير', category:'exam' },
+        { day:10, title:'امتحان 2', category:'exam' },
+        { day:12, title:'امتحان 3', category:'exam' },
+        { day:14, title:'امتحان 4', category:'exam' },
+        { day:15, title:'عاشوراء', category:'islamic' }
+      ]}
+    ];
+
+    const state = { activeMonthIndex: 0, view: 'month' };
+    const notesKey = 'jinan_calendar_notes_2026_2027';
+
+    const legend = document.getElementById('legend');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const monthNav = document.getElementById('monthNav');
+    const monthView = document.getElementById('monthView');
+    const yearView = document.getElementById('yearView');
+    const monthTitle = document.getElementById('monthTitle');
+    const seasonLabel = document.getElementById('seasonLabel');
+    const calendarGrid = document.getElementById('calendarGrid');
+    const eventList = document.getElementById('eventList');
+    const eventsCount = document.getElementById('eventsCount');
+    const summaryGrid = document.getElementById('summaryGrid');
+    const searchInput = document.getElementById('searchInput');
+    const notesArea = document.getElementById('notesArea');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalContent = document.getElementById('modalContent');
+    const navBtns = document.querySelectorAll('.nav-btn');
+
+    function softTap(el){
+      if (!el) return;
+      el.classList.remove('tap-pop');
+      void el.offsetWidth;
+      el.classList.add('tap-pop');
+      if (navigator.vibrate) navigator.vibrate(8);
+    }
+
+    function populateLegendAndFilter() {
+      Object.keys(categoryMeta).forEach(key => {
+        const meta = categoryMeta[key];
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        item.innerHTML = `<span class="dot" style="background:${meta.color}"></span>${meta.label}`;
+        legend.appendChild(item);
+
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = meta.label;
+        categoryFilter.appendChild(option);
+      });
+    }
+
+    function matchesFilters(event) {
+      const q = searchInput.value.trim().toLowerCase();
+      const cat = categoryFilter.value;
+      const text = `${event.title} ${categoryMeta[event.category].label}`.toLowerCase();
+      const queryOk = !q || text.includes(q);
+      const catOk = cat === 'all' || event.category === cat;
+      return queryOk && catOk;
+    }
+
+    function buildMonthNav() {
+      monthNav.innerHTML = '';
+      months.forEach((month, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'month-chip' + (index === state.activeMonthIndex ? ' active' : '');
+        btn.textContent = month.title;
+        btn.addEventListener('click', () => {
+          state.activeMonthIndex = index;
+          state.view = 'month';
+          softTap(btn);
+          render();
+        });
+        monthNav.appendChild(btn);
+      });
+    }
+
+    function renderCalendar(month) {
+      calendarGrid.innerHTML = '';
+      monthTitle.textContent = month.title;
+      seasonLabel.textContent = month.season;
+
+      weekDays.forEach(name => {
+        const head = document.createElement('div');
+        head.className = 'weekday';
+        head.textContent = name;
+        calendarGrid.appendChild(head);
+      });
+
+      for (let i = 0; i < month.startOffset; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'day empty';
+        calendarGrid.appendChild(empty);
+      }
+
+      for (let day = 1; day <= month.days; day++) {
+        const original = month.events.filter(e => e.day === day);
+        const filtered = original.filter(matchesFilters);
+        const cell = document.createElement('div');
+        cell.className = 'day' + (original.length ? ' has-events' : '') + (original.length && !filtered.length ? ' dimmed' : '');
+
+        const top = document.createElement('div');
+        top.className = 'day-top';
+
+        const number = document.createElement('div');
+        number.className = 'day-number';
+        number.textContent = day;
+        if (filtered.length) {
+          number.style.background = categoryMeta[filtered[0].category].color;
+          number.style.color = '#fff';
+        }
+
+        const count = document.createElement('div');
+        count.className = 'count';
+        count.textContent = filtered.length ? (filtered.length + ' حدث') : (original.length ? 'مخفي' : '');
+
+        top.appendChild(number);
+        top.appendChild(count);
+        cell.appendChild(top);
+
+        if (filtered.length) {
+          const text = document.createElement('div');
+          text.className = 'day-text';
+          text.textContent = filtered.map(e => e.title).join(' • ');
+          cell.appendChild(text);
+
+          const markers = document.createElement('div');
+          markers.className = 'marker-row';
+          [...new Set(filtered.map(e => e.category))].forEach(cat => {
+            const marker = document.createElement('span');
+            marker.className = 'marker';
+            marker.style.background = categoryMeta[cat].color;
+            markers.appendChild(marker);
+          });
+          cell.appendChild(markers);
+        }
+
+        if (original.length) {
+          cell.addEventListener('click', () => {
+            softTap(cell);
+            openModal(month.title, day, filtered.length ? filtered : original, !filtered.length);
+          });
+        }
+
+        calendarGrid.appendChild(cell);
+      }
+    }
+
+    function renderEvents(month) {
+      const items = month.events.filter(matchesFilters).sort((a, b) => a.day - b.day);
+      eventList.innerHTML = '';
+      eventsCount.textContent = items.length + ' حدث';
+
+      if (!items.length) {
+        eventList.innerHTML = '<div class="empty-state">لا توجد نتائج مطابقة في هذا الشهر.</div>';
+        return;
+      }
+
+      items.forEach(event => {
+        const meta = categoryMeta[event.category];
+        const card = document.createElement('div');
+        card.className = 'event-card';
+        card.innerHTML = `<div class="event-top"><span class="tag"><span class="dot" style="background:${meta.color}"></span>${meta.label}</span><span>${event.day} ${month.title.split(' ')[0]}</span></div><p class="event-title">${event.title}</p>`;
+        card.addEventListener('click', () => {
+          softTap(card);
+          const sameDay = month.events.filter(e => e.day === event.day && matchesFilters(e));
+          openModal(month.title, event.day, sameDay, false);
+        });
+        eventList.appendChild(card);
+      });
+    }
+
+    function renderSummary(month) {
+      const counts = { school:0, meeting:0, holiday:0, global:0, islamic:0, grades:0, review:0, exam:0 };
+      month.events.filter(matchesFilters).forEach(e => { counts[e.category]++; });
+      summaryGrid.innerHTML = '';
+      Object.keys(categoryMeta).forEach(key => {
+        const box = document.createElement('div');
+        box.className = 'summary-box';
+        box.innerHTML = `<strong>${counts[key]}</strong><span>${categoryMeta[key].label}</span>`;
+        summaryGrid.appendChild(box);
+      });
+    }
+
+    function renderYear() {
+      yearView.innerHTML = '';
+      months.forEach((month, index) => {
+        const card = document.createElement('div');
+        card.className = 'mini-month glass';
+        card.innerHTML = `<h3>${month.title}</h3>`;
+        const grid = document.createElement('div');
+        grid.className = 'mini-grid';
+
+        weekDays.forEach(day => {
+          const head = document.createElement('div');
+          head.className = 'mini-head';
+          head.textContent = day.slice(0,2);
+          grid.appendChild(head);
+        });
+
+        for (let i = 0; i < month.startOffset; i++) {
+          const empty = document.createElement('div');
+          empty.className = 'mini-day empty';
+          grid.appendChild(empty);
+        }
+
+        for (let d = 1; d <= month.days; d++) {
+          const visible = month.events.some(e => e.day === d && matchesFilters(e));
+          const el = document.createElement('div');
+          el.className = 'mini-day' + (visible ? ' eventful' : '');
+          el.textContent = d;
+          if (visible) {
+            el.addEventListener('click', () => {
+              state.activeMonthIndex = index;
+              state.view = 'month';
+              softTap(el);
+              render();
+            });
+          }
+          grid.appendChild(el);
+        }
+
+        card.appendChild(grid);
+        yearView.appendChild(card);
+      });
+    }
+
+    function openModal(monthTitleText, day, events, filteredOut) {
+      modalTitle.textContent = day + ' ' + monthTitleText;
+      modalContent.innerHTML = '';
+      if (filteredOut) {
+        const note = document.createElement('div');
+        note.className = 'empty-state';
+        note.textContent = 'هذا اليوم فيه أحداث لكنها غير ظاهرة بسبب الفلترة الحالية.';
+        modalContent.appendChild(note);
+      }
+      events.forEach(event => {
+        const meta = categoryMeta[event.category];
+        const card = document.createElement('div');
+        card.className = 'event-card';
+        card.innerHTML = `<div class="event-top"><span class="tag"><span class="dot" style="background:${meta.color}"></span>${meta.label}</span><span>${day}</span></div><p class="event-title">${event.title}</p>`;
+        modalContent.appendChild(card);
+      });
+      modal.classList.add('show');
+    }
+
+    function closeModal() {
+      modal.classList.remove('show');
+    }
+
+    function updateView() {
+      document.querySelectorAll('.switch-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === state.view);
+      });
+      monthView.classList.toggle('active', state.view === 'month');
+      yearView.classList.toggle('active', state.view === 'year');
+    }
+
+    function render() {
+      buildMonthNav();
+      const month = months[state.activeMonthIndex];
+      renderCalendar(month);
+      renderEvents(month);
+      renderSummary(month);
+      renderYear();
+      updateView();
+
+      const panel = document.getElementById('calendarPanel');
+      panel.classList.remove('month-animate');
+      void panel.offsetWidth;
+      panel.classList.add('month-animate');
+    }
+
+    document.querySelectorAll('.switch-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.view = btn.dataset.view;
+        softTap(btn);
+        updateView();
+      });
+    });
+
+    document.getElementById('prevMonth').addEventListener('click', () => {
+      state.activeMonthIndex = (state.activeMonthIndex - 1 + months.length) % months.length;
+      softTap(document.getElementById('prevMonth'));
+      render();
+    });
+
+    document.getElementById('nextMonth').addEventListener('click', () => {
+      state.activeMonthIndex = (state.activeMonthIndex + 1) % months.length;
+      softTap(document.getElementById('nextMonth'));
+      render();
+    });
+
+    document.getElementById('printBtn').addEventListener('click', () => { softTap(document.getElementById('printBtn')); window.print(); });
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      state.activeMonthIndex = 0;
+      state.view = 'month';
+      softTap(document.getElementById('resetBtn'));
+      render();
+    });
+
+    searchInput.addEventListener('input', render);
+    categoryFilter.addEventListener('change', render);
+
+    document.getElementById('saveNotes').addEventListener('click', () => {
+      localStorage.setItem(notesKey, notesArea.value);
+      softTap(document.getElementById('saveNotes'));
+      alert('تم حفظ الملاحظات.');
+    });
+
+    document.getElementById('clearNotes').addEventListener('click', () => {
+      notesArea.value = '';
+      localStorage.removeItem(notesKey);
+      softTap(document.getElementById('clearNotes'));
+    });
+
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeModal();
+    });
+
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        navBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        softTap(btn);
+        const target = btn.dataset.target;
+        if (target === 'month') document.getElementById('monthView').scrollIntoView({behavior:'smooth'});
+        if (target === 'events') document.getElementById('eventsPanel').scrollIntoView({behavior:'smooth'});
+        if (target === 'search') {
+          window.scrollTo({top:0,behavior:'smooth'});
+          setTimeout(() => searchInput.focus(), 220);
+        }
+      });
+    });
+
+    (function(){
+      const panel = document.getElementById('calendarPanel');
+      let startX = 0, startY = 0, touching = false;
+      panel.addEventListener('touchstart', e => {
+        const t = e.changedTouches[0];
+        startX = t.clientX; startY = t.clientY; touching = true;
+      }, {passive:true});
+      panel.addEventListener('touchend', e => {
+        if (!touching) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - startX;
+        const dy = t.clientY - startY;
+        touching = false;
+        if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy)) {
+          if (dx < 0) document.getElementById('nextMonth').click();
+          else document.getElementById('prevMonth').click();
+        }
+      }, {passive:true});
+    })();
+
+    notesArea.value = localStorage.getItem(notesKey) || '';
+    populateLegendAndFilter();
+    render();
+  </script>
+</body>
+</html>
