@@ -788,53 +788,122 @@
     }
 
 
-    /* عرض الهاتف: التقويم يبقى أسبوعيًا لكن بمساحة فعلية لكل يوم */
+    /* الهاتف: تظهر أيام الأسبوع السبعة كاملة من دون تمرير أفقي */
     @media (max-width:699px){
-      .container{width:calc(100% - 10px);margin-top:5px}
+      .container{
+        width:calc(100% - 8px);
+        margin-top:4px;
+      }
+
+      .panel{
+        padding:10px 7px;
+        border-radius:22px;
+      }
+
       .calendar-panel{
-        overflow-x:auto;
-        -webkit-overflow-scrolling:touch;
-        overscroll-behavior-x:contain;
-        scrollbar-width:thin;
+        overflow-x:hidden;
+        width:100%;
       }
+
       .calendar-grid{
-        min-width:790px;
-        gap:7px;
-        padding-bottom:6px;
+        width:100%;
+        min-width:0;
+        grid-template-columns:repeat(7,minmax(0,1fr));
+        gap:3px;
+        padding-bottom:2px;
       }
+
       .weekday{
-        font-size:.73rem;
-        padding:9px 4px;
+        min-width:0;
+        padding:7px 1px;
+        border-radius:10px;
+        font-size:.58rem;
+        line-height:1.15;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:clip;
       }
+
       .day{
-        min-height:128px;
-        padding:8px;
+        min-width:0;
+        min-height:112px;
+        padding:5px 3px;
+        border-radius:12px;
+        gap:4px;
       }
+
+      .day-top{
+        gap:1px;
+      }
+
       .day-number{
-        width:29px;
-        height:29px;
-        font-size:.8rem;
+        width:24px;
+        height:24px;
+        min-width:24px;
+        border-radius:8px;
+        font-size:.68rem;
       }
+
+      .count{
+        display:none;
+      }
+
       .day-text{
         display:block;
         overflow:visible;
         -webkit-line-clamp:unset;
         -webkit-box-orient:initial;
-        font-size:.76rem;
-        line-height:1.48;
         white-space:normal;
+        overflow-wrap:anywhere;
         word-break:normal;
+        color:#63726a;
+        font-size:.56rem;
+        line-height:1.34;
       }
-      .count{display:block}
+
+      .marker-row{
+        gap:2px;
+      }
+
+      .marker{
+        width:5px;
+        height:5px;
+      }
+
+      .month-header{
+        margin-bottom:9px;
+      }
+
+      .month-title{
+        font-size:1.08rem;
+      }
+
       .swipe-hint{
-        position:sticky;
-        right:0;
-        left:0;
-        z-index:4;
+        display:none;
       }
+
       .event-title{
-        font-size:.94rem;
-        line-height:1.65;
+        font-size:.92rem;
+        line-height:1.6;
+      }
+    }
+
+    @media (max-width:380px){
+      .calendar-grid{gap:2px}
+      .weekday{font-size:.53rem}
+      .day{
+        min-height:108px;
+        padding:4px 2px;
+      }
+      .day-text{
+        font-size:.52rem;
+        line-height:1.3;
+      }
+      .day-number{
+        width:22px;
+        height:22px;
+        min-width:22px;
+        font-size:.64rem;
       }
     }
 
@@ -1366,10 +1435,12 @@
       monthTitle.textContent = month.title;
       seasonLabel.textContent = month.season;
 
-      weekDays.forEach(name => {
+      const mobileWeekDays = ['الإثن','الثلا','الأرب','الخمي','الجم','السب','الأحد'];
+      weekDays.forEach((name, index) => {
         const head = document.createElement('div');
         head.className = 'weekday';
-        head.textContent = name;
+        head.textContent = window.innerWidth < 700 ? mobileWeekDays[index] : name;
+        head.title = name;
         calendarGrid.appendChild(head);
       });
 
@@ -1515,10 +1586,14 @@
         const grid = document.createElement('div');
         grid.className = 'mini-grid';
 
-        weekDays.forEach(day => {
+        const miniNames = window.innerWidth < 700
+          ? ['إث','ثل','أر','خم','جم','سب','أح']
+          : weekDays.map(day => day.slice(0,2));
+
+        miniNames.forEach(day => {
           const head = document.createElement('div');
           head.className = 'mini-head';
-          head.textContent = day.slice(0,2);
+          head.textContent = day;
           grid.appendChild(head);
         });
 
@@ -1803,6 +1878,16 @@
     revealSections();
     addPressFeedback();
 
+
+
+    let lastMobileState = window.innerWidth < 700;
+    window.addEventListener('resize', () => {
+      const nowMobile = window.innerWidth < 700;
+      if (nowMobile !== lastMobileState){
+        lastMobileState = nowMobile;
+        render();
+      }
+    });
 
     notesArea.value = localStorage.getItem(notesKey) || '';
     populateLegendAndFilter();
