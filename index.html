@@ -1053,14 +1053,14 @@
   
     .event-reminder-btn{
       margin-top:8px;
-      border:0;
+      border:1px solid rgba(47,110,79,.18);
       border-radius:12px;
-      padding:8px 10px;
+      padding:9px 12px;
       cursor:pointer;
       font-weight:800;
       font-size:.78rem;
-      background:rgba(255,255,255,.72);
-      color:inherit;
+      background:#eef6f1;
+      color:#24573e;
       box-shadow:0 6px 16px rgba(0,0,0,.06);
       transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
       backdrop-filter:blur(8px);
@@ -1551,7 +1551,7 @@
           const meta = categoryMeta[event.category];
           const card = document.createElement('div');
           card.className = 'event-card';
-          card.innerHTML = `<div class="event-top"><span class="tag"><span class="dot" style="background:${meta.color}"></span>${meta.label}</span><span class="search-result-date">${event.day} ${resultMonth.title}</span></div><p class="event-title">${event.title}</p>`;
+          card.innerHTML = `<div class="event-top"><span class="tag"><span class="dot" style="background:${meta.color}"></span>${meta.label}</span><span class="search-result-date">${event.day} ${resultMonth.title}</span></div><p class="event-title">${event.title}</p><button type="button" class="event-reminder-btn" data-reminder-title="${event.title.replace(/"/g,'&quot;')}" data-reminder-date="${resultMonth.key}-${String(event.day).padStart(2,'0')}">🔔 ذكّرني</button>`;
           card.addEventListener('click', () => {
             state.activeMonthIndex = monthIndex;
             state.view = 'month';
@@ -1579,7 +1579,7 @@
         const meta = categoryMeta[event.category];
         const card = document.createElement('div');
         card.className = 'event-card';
-        card.innerHTML = `<div class="event-top"><span class="tag"><span class="dot" style="background:${meta.color}"></span>${meta.label}</span><span>${event.day} ${month.title.split(' ')[0]}</span></div><p class="event-title">${event.title}</p>`;
+        card.innerHTML = `<div class="event-top"><span class="tag"><span class="dot" style="background:${meta.color}"></span>${meta.label}</span><span>${event.day} ${month.title.split(' ')[0]}</span></div><p class="event-title">${event.title}</p><button type="button" class="event-reminder-btn" data-reminder-title="${event.title.replace(/"/g,'&quot;')}" data-reminder-date="${month.key}-${String(event.day).padStart(2,'0')}">🔔 ذكّرني</button>`;
         card.addEventListener('click', () => {
           softTap(card);
           const sameDay = month.events.filter(e => e.day === event.day && matchesFilters(e));
@@ -1661,7 +1661,9 @@
         const meta = categoryMeta[event.category];
         const card = document.createElement('div');
         card.className = 'event-card';
-        card.innerHTML = `<div class="event-top"><span class="tag"><span class="dot" style="background:${meta.color}"></span>${meta.label}</span><span>${day}</span></div><p class="event-title">${event.title}</p>`;
+        const modalMonth = months.find(m => m.title === monthTitleText);
+        const modalDate = modalMonth ? `${modalMonth.key}-${String(day).padStart(2,'0')}` : '';
+        card.innerHTML = `<div class="event-top"><span class="tag"><span class="dot" style="background:${meta.color}"></span>${meta.label}</span><span>${day}</span></div><p class="event-title">${event.title}</p>${modalDate ? `<button type="button" class="event-reminder-btn" data-reminder-title="${event.title.replace(/"/g,'&quot;')}" data-reminder-date="${modalDate}">🔔 ذكّرني</button>` : ''}`;
         modalContent.appendChild(card);
       });
       modal.classList.add('show');
@@ -1965,6 +1967,7 @@
       const btn = e.target.closest('[data-reminder-title][data-reminder-date]');
       if(btn){
         e.preventDefault();
+        e.stopPropagation();
         openReminder(btn.dataset.reminderTitle, btn.dataset.reminderDate);
       }
     });
@@ -1992,42 +1995,6 @@
     document.addEventListener('keydown', (e) => {
       if(e.key === 'Escape') closeReminder();
     });
-
-    function attachReminderButtons(){
-      document.querySelectorAll('.event-card').forEach(card => {
-        if(card.querySelector('.event-reminder-btn')) return;
-
-        const dayCell = card.closest('[data-date], .day-cell');
-        let isoDate = dayCell?.dataset?.date || '';
-
-        // Fallback: infer from nearest visible day + current month key
-        if(!isoDate){
-          const num = dayCell?.querySelector('.day-number')?.textContent?.trim();
-          const currentMonth = months?.[currentMonthIndex]?.key || months?.[currentMonthIndex]?.id || '';
-          if(num && /^\d{4}-\d{2}$/.test(currentMonth)){
-            isoDate = `${currentMonth}-${String(num).padStart(2,'0')}`;
-          }
-        }
-
-        const titleNode = card.querySelector('.event-title, .event-text, strong, b');
-        const title = (titleNode?.textContent || card.textContent || 'حدث مدرسي').trim().replace(/\s+/g,' ');
-
-        if(!isoDate) return;
-
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'event-reminder-btn';
-        btn.textContent = '🔔 ذكّرني';
-        btn.dataset.reminderTitle = title;
-        btn.dataset.reminderDate = isoDate;
-        card.appendChild(btn);
-      });
-    }
-
-    const reminderObserver = new MutationObserver(() => attachReminderButtons());
-    reminderObserver.observe(document.body, {childList:true, subtree:true});
-    setTimeout(attachReminderButtons, 250);
-
 </script>
 
   <div id="reminderModal" class="reminder-modal" aria-hidden="true">
