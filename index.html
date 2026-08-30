@@ -243,9 +243,9 @@
       box-shadow:0 14px 34px rgba(31,55,46,.08);
     }
 
-    input,select,textarea,button{font:inherit}
+    input,select,button{font:inherit}
 
-    .field,.select,.textarea{
+    .field,.select{
       width:100%;
       color:var(--text);
       background:rgba(255,255,255,.88);
@@ -257,9 +257,8 @@
     }
 
     .field,.select{padding:12px 14px}
-    .textarea{min-height:128px;padding:14px;resize:vertical;line-height:1.8}
 
-    .field:focus,.select:focus,.textarea:focus{
+    .field:focus,.select:focus{
       border-color:rgba(83,122,108,.28);
       box-shadow:0 0 0 4px rgba(83,122,108,.075);
       background:#fff;
@@ -1133,17 +1132,6 @@
             </div>
             <div class="summary" id="summaryGrid"></div>
           </div>
-
-          <div class="panel glass">
-            <div class="panel-head">
-              <h4>ملاحظات</h4>
-            </div>
-            <textarea id="notesArea" class="textarea" placeholder="اكتب ملاحظاتك هنا..."></textarea>
-            <div class="action-wrap" style="margin-top:12px;">
-              <button id="saveNotes" class="btn-primary">حفظ</button>
-              <button id="clearNotes" class="btn-soft">مسح</button>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -1295,7 +1283,6 @@
     ];
 
     const state = { activeMonthIndex: 0, view: 'month', searchHit: null };
-    const notesKey = 'jinan_calendar_notes_2026_2027';
 
     const legend = document.getElementById('legend');
     const categoryFilter = document.getElementById('categoryFilter');
@@ -1309,7 +1296,6 @@
     const eventsCount = document.getElementById('eventsCount');
     const summaryGrid = document.getElementById('summaryGrid');
     const searchInput = document.getElementById('searchInput');
-    const notesArea = document.getElementById('notesArea');
     const modal = document.getElementById('modal');
     const modalTitle = document.getElementById('modalTitle');
     const modalContent = document.getElementById('modalContent');
@@ -1706,19 +1692,6 @@
       if (normalizeArabic(searchInput.value).length >= 2) jumpToFirstSearchResult();
       else render();
     });
-
-    document.getElementById('saveNotes').addEventListener('click', () => {
-      localStorage.setItem(notesKey, notesArea.value);
-      softTap(document.getElementById('saveNotes'));
-
-    });
-
-    document.getElementById('clearNotes').addEventListener('click', () => {
-      notesArea.value = '';
-      localStorage.removeItem(notesKey);
-      softTap(document.getElementById('clearNotes'));
-    });
-
     document.getElementById('closeModal').addEventListener('click', closeModal);
     modal.addEventListener('click', e => {
       if (e.target === modal) closeModal();
@@ -1866,15 +1839,6 @@
         markToday();
       });
     };
-
-    // Toast لطيف عند حفظ الملاحظات بدل الاعتماد فقط على alert
-    const saveNotesBtnMotion = document.getElementById('saveNotes');
-    if (saveNotesBtnMotion){
-      saveNotesBtnMotion.addEventListener('click', () => {
-        showToast('تم حفظ الملاحظات ✓');
-      });
-    }
-
     revealSections();
     addPressFeedback();
 
@@ -1889,7 +1853,6 @@
       }
     });
 
-    notesArea.value = localStorage.getItem(notesKey) || '';
     populateLegendAndFilter();
     render();
   </script>
