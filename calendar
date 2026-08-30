@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>رزنامة الجنان</title>
+  <title>رزنامة الجنان 2026–2027</title>
   
   <style>
     :root{
@@ -598,6 +598,9 @@
       font-weight:650;
     }
 
+    .month-view{display:none}
+    .month-view.active{display:block}
+
     .year-view{
       display:none;
       grid-template-columns:1fr;
@@ -605,7 +608,6 @@
     }
 
     .year-view.active{display:grid}
-    .month-view.active{display:block}
 
     .mini-month{
       padding:13px;
@@ -785,6 +787,68 @@
       .year-view{grid-template-columns:repeat(3,minmax(0,1fr))}
     }
 
+
+    /* عرض الهاتف: التقويم يبقى أسبوعيًا لكن بمساحة فعلية لكل يوم */
+    @media (max-width:699px){
+      .container{width:calc(100% - 10px);margin-top:5px}
+      .calendar-panel{
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+        overscroll-behavior-x:contain;
+        scrollbar-width:thin;
+      }
+      .calendar-grid{
+        min-width:790px;
+        gap:7px;
+        padding-bottom:6px;
+      }
+      .weekday{
+        font-size:.73rem;
+        padding:9px 4px;
+      }
+      .day{
+        min-height:128px;
+        padding:8px;
+      }
+      .day-number{
+        width:29px;
+        height:29px;
+        font-size:.8rem;
+      }
+      .day-text{
+        display:block;
+        overflow:visible;
+        -webkit-line-clamp:unset;
+        -webkit-box-orient:initial;
+        font-size:.76rem;
+        line-height:1.48;
+        white-space:normal;
+        word-break:normal;
+      }
+      .count{display:block}
+      .swipe-hint{
+        position:sticky;
+        right:0;
+        left:0;
+        z-index:4;
+      }
+      .event-title{
+        font-size:.94rem;
+        line-height:1.65;
+      }
+    }
+
+    .day.search-hit{
+      outline:3px solid rgba(83,122,108,.24);
+      box-shadow:0 0 0 5px rgba(83,122,108,.08),0 14px 30px rgba(31,55,46,.10);
+      transform:translateY(-2px);
+    }
+
+    .search-result-date{
+      font-weight:800;
+      color:var(--green-dark);
+    }
+
     @media (prefers-reduced-motion:reduce){
       *{scroll-behavior:auto!important;animation:none!important;transition:none!important}
     }
@@ -849,7 +913,7 @@
     <section class="month-view active" id="monthView">
       <div class="layout">
         <div class="panel glass calendar-panel" id="calendarPanel">
-          <p class="swipe-hint">اسحب يمينًا أو يسارًا للتنقل بين الأشهر</p>
+          <p class="swipe-hint">على الهاتف: حرّك التقويم أفقياً لرؤية محتوى الأيام كاملاً</p>
           <div class="month-header">
             <div>
               <div class="season" id="seasonLabel"></div>
@@ -1017,9 +1081,9 @@
         { day:4, title:'توزيع علامات الحلقة الثانية - السعي الثاني', category:'grades' },
         { day:5, title:'توزيع علامات السعي الثالث - متوسط وثانوي', category:'grades' },
         { day:16, title:'عيد الأضحى', category:'islamic' },
-        { day:23, title:'Open Day PS3 / PS2 / PS1 + علامات (24)', category:'meeting' },
-        { day:24, title:'المقاومة والتحرير (25)', category:'holiday' },
-        { day:25, title:'Open Day PS3 / PS2 / PS1 + علامات (26)', category:'meeting' },
+        { day:24, title:'Open Day PS3 / PS2 / PS1 + علامات', category:'meeting' },
+        { day:25, title:'المقاومة والتحرير', category:'holiday' },
+        { day:26, title:'Open Day PS3 / PS2 / PS1 + علامات', category:'meeting' },
         { day:31, title:'انتهاء العام الدراسي - الحلقة الأولى والروضات', category:'school' }
       ]},
       { key:'2027-06', title:'حزيران 2027', season:'بداية فصل الصيف', days:30, startOffset:1, events:[
@@ -1037,7 +1101,7 @@
       ]}
     ];
 
-    const state = { activeMonthIndex: 0, view: 'month' };
+    const state = { activeMonthIndex: 0, view: 'month', searchHit: null };
     const notesKey = 'jinan_calendar_notes_2026_2027';
 
     const legend = document.getElementById('legend');
@@ -1081,13 +1145,80 @@
       });
     }
 
+    function normalizeArabic(text = '') {
+      return String(text)
+        .normalize('NFKD')
+        .replace(/[\u064B-\u065F\u0670]/g, '')
+        .replace(/[أإآٱ]/g, 'ا')
+        .replace(/ى/g, 'ي')
+        .replace(/ة/g, 'ه')
+        .replace(/ؤ/g, 'و')
+        .replace(/ئ/g, 'ي')
+        .replace(/ـ/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+    }
+
     function matchesFilters(event) {
-      const q = searchInput.value.trim().toLowerCase();
+      const q = normalizeArabic(searchInput.value);
       const cat = categoryFilter.value;
-      const text = `${event.title} ${categoryMeta[event.category].label}`.toLowerCase();
+      const text = normalizeArabic(`${event.title} ${categoryMeta[event.category].label}`);
       const queryOk = !q || text.includes(q);
       const catOk = cat === 'all' || event.category === cat;
       return queryOk && catOk;
+    }
+
+    function getGlobalSearchResults() {
+      const q = normalizeArabic(searchInput.value);
+      const cat = categoryFilter.value;
+      if (!q) return [];
+
+      const results = [];
+      months.forEach((month, monthIndex) => {
+        month.events.forEach(event => {
+          const categoryOk = cat === 'all' || event.category === cat;
+          const haystack = normalizeArabic(
+            `${event.title} ${categoryMeta[event.category].label} ${month.title}`
+          );
+          if (categoryOk && haystack.includes(q)) {
+            results.push({ month, monthIndex, event });
+          }
+        });
+      });
+
+      return results.sort((a, b) =>
+        a.monthIndex - b.monthIndex || a.event.day - b.event.day
+      );
+    }
+
+    function jumpToFirstSearchResult() {
+      const q = normalizeArabic(searchInput.value);
+      if (q.length < 2) {
+        state.searchHit = null;
+        render();
+        return;
+      }
+
+      const results = getGlobalSearchResults();
+      if (!results.length) {
+        state.searchHit = null;
+        render();
+        return;
+      }
+
+      const first = results[0];
+      state.activeMonthIndex = first.monthIndex;
+      state.view = 'month';
+      state.searchHit = { monthIndex:first.monthIndex, day:first.event.day };
+      render();
+
+      requestAnimationFrame(() => {
+        const hit = document.querySelector(
+          `.day[data-month-index="${first.monthIndex}"][data-day="${first.event.day}"]`
+        );
+        if (hit) hit.scrollIntoView({ behavior:'smooth', block:'center', inline:'center' });
+      });
     }
 
     function buildMonthNav() {
@@ -1129,6 +1260,13 @@
         const filtered = original.filter(matchesFilters);
         const cell = document.createElement('div');
         cell.className = 'day' + (original.length ? ' has-events' : '') + (original.length && !filtered.length ? ' dimmed' : '');
+        cell.dataset.day = day;
+        cell.dataset.monthIndex = state.activeMonthIndex;
+        if (state.searchHit &&
+            state.searchHit.monthIndex === state.activeMonthIndex &&
+            state.searchHit.day === day) {
+          cell.classList.add('search-hit');
+        }
 
         const top = document.createElement('div');
         top.className = 'day-top';
@@ -1178,12 +1316,43 @@
     }
 
     function renderEvents(month) {
-      const items = month.events.filter(matchesFilters).sort((a, b) => a.day - b.day);
+      const isSearching = normalizeArabic(searchInput.value).length >= 2;
       eventList.innerHTML = '';
+
+      if (isSearching) {
+        const results = getGlobalSearchResults();
+        eventsCount.textContent = results.length + ' نتيجة في السنة';
+
+        if (!results.length) {
+          eventList.innerHTML = '<div class="empty-state">لا توجد نتيجة مطابقة في رزنامة السنة.</div>';
+          return;
+        }
+
+        results.forEach(({month:resultMonth, monthIndex, event}) => {
+          const meta = categoryMeta[event.category];
+          const card = document.createElement('div');
+          card.className = 'event-card';
+          card.innerHTML = `<div class="event-top"><span class="tag"><span class="dot" style="background:${meta.color}"></span>${meta.label}</span><span class="search-result-date">${event.day} ${resultMonth.title}</span></div><p class="event-title">${event.title}</p>`;
+          card.addEventListener('click', () => {
+            state.activeMonthIndex = monthIndex;
+            state.view = 'month';
+            state.searchHit = { monthIndex, day:event.day };
+            render();
+            requestAnimationFrame(() => {
+              const hit = document.querySelector(`.day[data-month-index="${monthIndex}"][data-day="${event.day}"]`);
+              if (hit) hit.scrollIntoView({behavior:'smooth', block:'center', inline:'center'});
+            });
+          });
+          eventList.appendChild(card);
+        });
+        return;
+      }
+
+      const items = month.events.filter(matchesFilters).sort((a, b) => a.day - b.day);
       eventsCount.textContent = items.length + ' حدث';
 
       if (!items.length) {
-        eventList.innerHTML = '<div class="empty-state">لا توجد نتائج مطابقة في هذا الشهر.</div>';
+        eventList.innerHTML = '<div class="empty-state">لا توجد أحداث مطابقة في هذا الشهر.</div>';
         return;
       }
 
@@ -1326,12 +1495,18 @@
     document.getElementById('resetBtn').addEventListener('click', () => {
       state.activeMonthIndex = 0;
       state.view = 'month';
+      state.searchHit = null;
+      searchInput.value = '';
+      categoryFilter.value = 'all';
       softTap(document.getElementById('resetBtn'));
       render();
     });
 
-    searchInput.addEventListener('input', render);
-    categoryFilter.addEventListener('change', render);
+    searchInput.addEventListener('input', jumpToFirstSearchResult);
+    categoryFilter.addEventListener('change', () => {
+      if (normalizeArabic(searchInput.value).length >= 2) jumpToFirstSearchResult();
+      else render();
+    });
 
     document.getElementById('saveNotes').addEventListener('click', () => {
       localStorage.setItem(notesKey, notesArea.value);
@@ -1374,6 +1549,7 @@
       }, {passive:true});
       panel.addEventListener('touchend', e => {
         if (!touching) return;
+        if (window.innerWidth < 700) { touching = false; return; }
         const t = e.changedTouches[0];
         const dx = t.clientX - startX;
         const dy = t.clientY - startY;
